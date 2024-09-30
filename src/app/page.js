@@ -1,30 +1,45 @@
 'use client';
 
- // any component that uses useAuth needs this because if a component directly imports useAuth, it needs to be a client component since useAuth uses React hooks.
-
-import { Button } from 'react-bootstrap';
-import { signOut } from '@/utils/auth'; // anything in the src dir, you can use the @ instead of relative paths
+// any component that uses useAuth needs this because if a component directly imports useAuth, it needs to be a client component since useAuth uses React hooks.
 import { useAuth } from '@/utils/context/authContext';
+import { useEffect, useState } from 'react';
 
 function Home() {
+  const [uselessFact, setUseLessFact] = useState({});
+
   const { user } = useAuth();
 
+  const fetchFact = async () => {
+    const response = await fetch('https://uselessfacts.jsph.pl/api/v2/facts/random?language=en');
+    const fact = await response.json();
+
+    setUseLessFact(fact);
+  };
+
+  const selectResponse = (boolean) => {
+    const obj = {
+      userId: user.uid,
+      permalink: uselessFact.permalink,
+      response: boolean,
+    };
+    console.log(boolean, obj);
+  };
+
+  useEffect(() => {
+    fetchFact();
+  }, []);
   return (
-    <div
-      className="text-center d-flex flex-column justify-content-center align-content-center"
-      style={{
-        height: '90vh',
-        padding: '30px',
-        maxWidth: '400px',
-        margin: '0 auto',
-      }}
-    >
-      <h1>Hello {user.displayName}! </h1>
-      <p>Click the button below to logout!</p>
-      <Button variant="danger" type="button" size="lg" className="copy-btn" onClick={signOut}>
-        Sign Out
-      </Button>
-    </div>
+    <>
+      {uselessFact.text}
+
+      <h4>Did you know this fact?</h4>
+      <button className="btn btn-success" type="button" onClick={() => selectResponse(true)}>
+        YES
+      </button>
+      <button className="btn btn-danger" type="button" onClick={() => selectResponse(false)}>
+        NO
+      </button>
+    </>
   );
 }
 
