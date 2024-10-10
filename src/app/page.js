@@ -22,7 +22,8 @@ function Home() {
       permalink: uselessFact.permalink,
       response: boolean,
     };
-    console.log(boolean, obj);
+    fetchFact();
+    return obj;
   };
 
   useEffect(() => {
